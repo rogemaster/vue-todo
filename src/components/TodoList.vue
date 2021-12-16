@@ -1,8 +1,9 @@
 <template>
     <div>
-        <ul>
+        <ul> 
             <li v-for="(todoItem, index) in todoItems" :key="index" class="shdow">
-                {{todoItem}}
+                <i class="checkBtn fas fa-check" :class="{ checkBtnCompleted: todoItem.completed }" @click="toggleComplete(todoItem)"></i>
+                <span :class="{ textCompleted: todoItem.completed }">{{ todoItem.item }}</span>
                 <span class="removeBtn" @click="removeTodo(todoItem, index)">
                     <i class="fas fa-trash-alt"></i>
                 </span>
@@ -23,7 +24,7 @@ export default {
         if(localStorage.length > 0) {
             for(var i = 0; i < localStorage.length; i++) {
                 if(localStorage.key(i) !== 'loglevel:webpack-dev-server') {
-                    this.todoItems.push(localStorage.key(i));
+                    this.todoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
                 }
             }
         }
@@ -33,6 +34,12 @@ export default {
         removeTodo(todoItem, index) {
             localStorage.removeItem(todoItem);
             this.todoItems.splice(index, 1);
+        },
+
+        toggleComplete(todoItem) {
+            todoItem.completed = !todoItem.completed
+            localStorage.removeItem(todoItem.item);
+            localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
         }
     }
 
@@ -60,6 +67,7 @@ li {
     line-height: 45px;
     color: #62acde;
     margin-right: 5px;
+    cursor: pointer;
 }
 .checkBtnCompleted {
     color: #b3adad;
