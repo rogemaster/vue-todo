@@ -1,45 +1,28 @@
 <template>
     <div>
-        <ul> 
-            <li v-for="(todoItem, index) in todoItems" :key="index" class="shdow">
-                <i class="checkBtn fas fa-check" :class="{ checkBtnCompleted: todoItem.completed }" @click="toggleComplete(todoItem)"></i>
+        <transition-group name="list" tag="ul">
+            <li v-for="(todoItem, index) in propsdata" :key="index" class="shdow">
+                <i class="checkBtn fas fa-check" :class="{ checkBtnCompleted: todoItem.completed }" @click="toggleComplete(todoItem, index)"></i>
                 <span :class="{ textCompleted: todoItem.completed }">{{ todoItem.item }}</span>
                 <span class="removeBtn" @click="removeTodo(todoItem, index)">
                     <i class="fas fa-trash-alt"></i>
                 </span>
             </li>
-        </ul>
+        </transition-group>
     </div>
 </template>
 
 <script>
 export default {
-    data() {
-        return {
-            todoItems: []
-        }
-    },
-
-    created() {
-        if(localStorage.length > 0) {
-            for(var i = 0; i < localStorage.length; i++) {
-                if(localStorage.key(i) !== 'loglevel:webpack-dev-server') {
-                    this.todoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-                }
-            }
-        }
-    },
+    props: ['propsdata'],
 
     methods: {
         removeTodo(todoItem, index) {
-            localStorage.removeItem(todoItem);
-            this.todoItems.splice(index, 1);
+            this.$emit('removeItem', todoItem, index);
         },
 
-        toggleComplete(todoItem) {
-            todoItem.completed = !todoItem.completed
-            localStorage.removeItem(todoItem.item);
-            localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
+        toggleComplete(todoItem, index) {
+            this.$emit('toggleItem', todoItem, index)
         }
     }
 
@@ -80,6 +63,15 @@ li {
     margin-left: auto;
     color: #de4343;
     cursor: pointer;
+}
+
+/* 리스트 아이템 트렌지션 */
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 </style>
